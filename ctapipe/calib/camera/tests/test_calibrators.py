@@ -5,10 +5,9 @@ from ctapipe.utils.datasets import get_path
 
 def get_test_parameters():
     parameters = {"integrator": "nb_peak_integration",
-                  "window": 7,
-                  "shift": 3,
-                  "sigamp": [2, 4],
-                  "lwt": 0}
+                  "integration_window": [7, 3],
+                  "integration_sigamp": [2, 4],
+                  "integration_lwt": 0}
     return parameters
 
 
@@ -23,7 +22,7 @@ def test_calibrate_event():
     telid = 11
     event = get_test_event()
     calibrated = calibrate_event(event, get_test_parameters())
-    pe = calibrated.dl1.tel[telid].pe_charge
+    pe = calibrated.dl1.tel[telid].calibrated_image
     assert round(pe[0], 5) == -1.89175
 
 
@@ -33,7 +32,7 @@ def test_calibrate_source():
     source = hessio_event_source(filename)
     c_source = calibrate_source(source, get_test_parameters())
     for event in c_source:
-        if event.dl1.event_id == 408:
-            pe = event.dl1.tel[telid].pe_charge
+        if event.dl0.event_id == 408:
+            pe = event.dl1.tel[telid].calibrated_image
             assert round(pe[0], 5) == 1.86419
             break

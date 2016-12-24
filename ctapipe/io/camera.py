@@ -77,7 +77,10 @@ class CameraGeometry:
         self.neighbors = neighbors
         self.pix_type = pix_type
         self.pix_rotation = Angle(pix_rotation)
-        self.rotate(cam_rotation)
+        self.cam_rotation = cam_rotation
+        # FIXME the rotation does not work on 2D pixel grids
+        if len(pix_x.shape) == 1:
+            self.rotate(cam_rotation)
 
 
     @classmethod
@@ -123,7 +126,7 @@ class CameraGeometry:
         after this is called, the pix_x and pix_y arrays are
         rotated.
 
-        Note:
+        Notes
         -----
 
         This is intended only to correct simulated data that are
@@ -206,11 +209,11 @@ def guess_camera_geometry(pix_x: u.m, pix_y: u.m, optical_foclen: u.m):
     pixsep = []
     for ipix in range(1, len(pix_x)):
         dx = pix_x[ipix] - pix_x[0]
-        dy = pix_y[ipix] - pix_y[0]        
+        dy = pix_y[ipix] - pix_y[0]
         pixsep.append (np.sqrt(dx ** 2 + dy ** 2))  # dist between pixels 0 and ipix
-        
+
     dist = min(pixsep)
-        
+
     tel_type, cam_id, pix_type, pix_rotation, cam_rotation = _guess_camera_type(
         len(pix_x), optical_foclen
     )
